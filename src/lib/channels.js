@@ -22,6 +22,11 @@ export const BUILTIN = [
       { label: 'Globecast — 360p', url: 'https://cdn-globecast.akamaized.net/live/eds/saudi_quran/hls_roku/index.m3u8' },
     ],
   },
+  {
+    id: 'nidaa', name: 'إذاعة نداء الإسلام', short: 'نداء', tone: '#7f8fb5', logo: '', radio: true,
+    officialUrl: 'https://www.sba.sa/',
+    sources: [{ label: 'هيئة الإذاعة والتلفزيون — بث صوتي', url: 'https://live.kwikmotion.com/sbrksanedaradiolive/srpksanedaradio/playlist.m3u8' }],
+  },
 ];
 
 /* ---------- تحليل الروابط ---------- */
@@ -92,6 +97,7 @@ export function clean(c) {
     tone: /^#[0-9a-f]{3,8}$/i.test(c.tone || '') ? c.tone : '#9a9aa6',
     logo: /^https?:\/\//i.test(c.logo || '') ? c.logo : '',
     officialUrl: /^https?:\/\//i.test(c.officialUrl || '') ? c.officialUrl : '',
+    radio: !!c.radio,
     sources,
   };
 }

@@ -71,6 +71,7 @@ export default function LivePlayer({ channel, settings, onSettings, onStatus, id
   const [buffering, setBuffering] = useState(false);
   const [srcInfo, setSrcInfo] = useState({ i: 0, n: 0, label: '' });
   const [quality, setQuality] = useState('');
+  const [audioOnly, setAudioOnly] = useState(false);
   const [error, setError] = useState('');
   const [forcedMute, setForcedMute] = useState(false);
   const [attempt, setAttempt] = useState(0);
@@ -102,6 +103,7 @@ export default function LivePlayer({ channel, settings, onSettings, onStatus, id
     }
     if (ytHostRef.current) ytHostRef.current.textContent = '';
     setQuality('');
+    setAudioOnly(false);
   }, []);
 
   /* ---------- تشغيل الفيديو (HLS/ملف) ---------- */
@@ -275,7 +277,7 @@ export default function LivePlayer({ channel, settings, onSettings, onStatus, id
         });
         hls.on(Hls.Events.LEVEL_SWITCHED, (_e, data) => {
           const l = hls.levels?.[data.level];
-          setQuality(levelLabel(l?.height));
+          setQuality(l?.height ? levelLabel(l.height) : '');
         });
         hls.on(Hls.Events.ERROR, (_e, data) => {
           if (!data.fatal || cancelled) return;
@@ -317,7 +319,12 @@ export default function LivePlayer({ channel, settings, onSettings, onStatus, id
       else startVideo(i, s);
     };
 
-    const onPlaying = () => engineRef.current === 'video' && markPlaying();
+    const onPlaying = () => {
+      if (engineRef.current !== 'video') return;
+      markPlaying();
+      // بث صوتي فقط (إذاعة): لا توجد صورة
+      setAudioOnly(!v.videoWidth && !v.videoHeight);
+    };
     const onWaiting = () => {
       if (!everPlayed || engineRef.current !== 'video') return;
       setBuffering(true);
@@ -334,7 +341,11 @@ export default function LivePlayer({ channel, settings, onSettings, onStatus, id
       if (hlsRef.current || engineRef.current !== 'video' || !v.getAttribute('src')) return;
       fail(cur, 'تعذّر تشغيل البث في هذا المتصفح.');
     };
-    const onResize = () => engineRef.current === 'video' && !hlsRef.current && setQuality(levelLabel(v.videoHeight));
+    const onResize = () => {
+      if (engineRef.current !== 'video') return;
+      if (v.videoHeight) setAudioOnly(false);
+      if (!hlsRef.current) setQuality(levelLabel(v.videoHeight));
+    };
     v.addEventListener('playing', onPlaying);
     v.addEventListener('waiting', onWaiting);
     v.addEventListener('pause', onPause);
@@ -488,6 +499,16 @@ export default function LivePlayer({ channel, settings, onSettings, onStatus, id
         preload="auto"
       />
       <div ref={ytHostRef} className={`player-yt ${engine === 'yt' && (phase === 'playing' || phase === 'paused') ? 'on' : ''}`} />
+
+      {(audioOnly || channel.radio) && engine === 'video' && (phase === 'playing' || phase === 'paused') ? (
+        <div className={`radio-screen ${phase === 'playing' && !buffering ? 'live' : ''}`} style={{ '--tone': channel.tone }}>
+          <div className="radio-waves" aria-hidden="true">
+            {Array.from({ length: 5 }, (_, k) => <i key={k} />)}
+          </div>
+          <div className="radio-name">{channel.name}</div>
+          <div className="radio-sub">بث إذاعي مباشر</div>
+        </div>
+      ) : null}
 
       {/* شريط علوي: القناة وحالة البث */}
       <div className="player-top">
