@@ -1,0 +1,12 @@
+{
+  "name": "مجلس — تلفزيون ذكي",
+  "short_name": "مجلس",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "./",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#0a0a0c",
+  "theme_color": "#0a0a0c",
+  "icons": [{ "src": "favicon.svg", "sizes": "any", "type": "image/svg+xml" }]
+}
