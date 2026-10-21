@@ -45,6 +45,14 @@ function safeRead() {
     if (!merged.city || typeof merged.city.lat !== 'number') merged.city = MADINAH;
     if (!Array.isArray(merged.customChannels)) merged.customChannels = [];
     if (merged.channelList != null && !Array.isArray(merged.channelList)) merged.channelList = null;
+    // إزالة مصدر يوتيوب خاطئ أُضيف سابقًا لقناة السنة من القوائم المحفوظة
+    if (Array.isArray(merged.channelList)) {
+      merged.channelList = merged.channelList.map((c) => ({
+        ...c,
+        sources: (c.sources || []).filter((x) => !String(x.url || '').includes('UCROKYPep-UuODNwyipe6JMw')),
+        officialUrl: String(c.officialUrl || '').includes('saudisunnahtv') ? 'https://www.sba.sa/' : c.officialUrl,
+      }));
+    }
     return merged;
   } catch {
     return { ...DEFAULTS };

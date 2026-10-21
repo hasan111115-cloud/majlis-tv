@@ -8,12 +8,8 @@
       "short": "السنة",
       "tone": "#b89a5e",
       "logo": "",
-      "officialUrl": "https://www.youtube.com/@saudisunnahtv",
+      "officialUrl": "https://www.sba.sa/",
       "sources": [
-        {
-          "label": "يوتيوب — القناة الرسمية (HD)",
-          "url": "https://www.youtube.com/channel/UCROKYPep-UuODNwyipe6JMw"
-        },
         {
           "label": "هيئة الإذاعة والتلفزيون — 720p",
           "url": "http://m.live.net.sa:1935/live/sunnah/playlist.m3u8"
