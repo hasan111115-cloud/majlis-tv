@@ -32,6 +32,8 @@ export const DEFAULTS = {
   effects: true,
   theme: 'dark', // 'dark' | 'system'
   customChannels: [],
+  channelList: null, // تُحفظ هنا قائمة القنوات كاملة بعد أول تعديل من المستخدم
+  quality: 'auto', // 'auto' | 'max'
 };
 
 function safeRead() {
@@ -42,6 +44,7 @@ function safeRead() {
     const merged = { ...DEFAULTS, ...parsed };
     if (!merged.city || typeof merged.city.lat !== 'number') merged.city = MADINAH;
     if (!Array.isArray(merged.customChannels)) merged.customChannels = [];
+    if (merged.channelList != null && !Array.isArray(merged.channelList)) merged.channelList = null;
     return merged;
   } catch {
     return { ...DEFAULTS };

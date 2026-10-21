@@ -114,7 +114,7 @@ function useFullscreen() {
 
 export default function App() {
   const settings = useSettings();
-  const channels = useChannels(settings.customChannels);
+  const { channels } = useChannels(settings);
   const city = settings.city;
   const weather = useWeather(city);
   const online = useOnline();
@@ -184,6 +184,7 @@ export default function App() {
       if (handleArrow(e)) return;
       if (isTyping(document.activeElement) || e.ctrlKey || e.metaKey || e.altKey) return;
       const idx = channels.findIndex((c) => c.id === active?.id);
+      if (!channels.length) return;
       if (!panelRef.current) {
         if (/^[1-9]$/.test(e.key) && channels[+e.key - 1]) {
           select(channels[+e.key - 1].id);
@@ -256,7 +257,15 @@ export default function App() {
             <Safe label="تعذّر تشغيل المشغّل" resetKey={active?.id}>
               {active ? (
                 <LivePlayer channel={active} settings={settings} onSettings={setSettings} onStatus={onStatus} idle={idle} />
-              ) : null}
+              ) : (
+                <div className="player">
+                  <div className="player-state">
+                    <p className="err-title">لا توجد قنوات</p>
+                    <p className="err-body">أضف قناة أو استعد القنوات الأصلية من الإعدادات ← القنوات.</p>
+                    <button className="btn" data-nav onClick={() => setPanel('settings')}>فتح الإعدادات</button>
+                  </div>
+                </div>
+              )}
             </Safe>
           </div>
         </div>

@@ -3,7 +3,8 @@ import { METHODS } from '../lib/prayer.js';
 import { searchCities, cityFromPosition, geoErrorText } from '../lib/geo.js';
 import { MADINAH, storageAvailable } from '../lib/settings.js';
 import { digitsOf } from '../lib/time.js';
-import { IconClose, IconSearch, IconLocate, IconPlus, IconMinus, IconTrash, IconPin } from './Icons.jsx';
+import { IconClose, IconSearch, IconLocate, IconPlus, IconMinus, IconPin } from './Icons.jsx';
+import ChannelManager from './ChannelManager.jsx';
 
 function Segmented({ label, value, options, onChange }) {
   return (
@@ -48,8 +49,6 @@ export default function SettingsPanel({ settings, set, reset, channels, onClose,
   const [busy, setBusy] = useState('');
   const [msg, setMsg] = useState('');
   const [confirmReset, setConfirmReset] = useState(false);
-  const [newCh, setNewCh] = useState({ name: '', url: '', site: '' });
-  const [chMsg, setChMsg] = useState('');
   const d = settings.digits;
 
   useEffect(() => {
@@ -93,38 +92,6 @@ export default function SettingsPanel({ settings, set, reset, channels, onClose,
       setMsg(geoErrorText(e));
     }
     setBusy('');
-  };
-
-  const addChannel = (e) => {
-    e.preventDefault();
-    const name = newCh.name.trim().slice(0, 40);
-    const url = newCh.url.trim();
-    const site = newCh.site.trim();
-    if (!name) return setChMsg('اكتب اسم القناة.');
-    if (!/^https?:\/\/\S+$/i.test(url)) return setChMsg('رابط البث يجب أن يبدأ بـ https:// (ويفضّل أن يكون بصيغة m3u8).');
-    if (site && !/^https?:\/\/\S+$/i.test(site)) return setChMsg('رابط الموقع الرسمي غير صحيح.');
-    const ch = {
-      id: `c-${Date.now().toString(36)}`,
-      name,
-      short: name.replace(/^قناة\s+/, '').split(/\s+/)[0].slice(0, 8),
-      tone: '#9aa0ad',
-      officialUrl: site,
-      sources: [{ label: 'رابط مضاف يدويًا', url }],
-    };
-    set({ customChannels: [...settings.customChannels, ch] });
-    setNewCh({ name: '', url: '', site: '' });
-    setChMsg(
-      url.startsWith('http:') && location.protocol === 'https:'
-        ? `أُضيفت «${name}». تنبيه: الرابط يبدأ بـ http وقد يمنعه المتصفح لأن الموقع يعمل عبر https.`
-        : `أُضيفت «${name}» إلى القائمة.`,
-    );
-  };
-
-  const removeChannel = (id) => {
-    set({
-      customChannels: settings.customChannels.filter((c) => c.id !== id),
-      ...(settings.defaultChannel === id ? { defaultChannel: 'sunnah' } : {}),
-    });
   };
 
   const vol = Math.round(settings.volume * 100);
@@ -237,31 +204,17 @@ export default function SettingsPanel({ settings, set, reset, channels, onClose,
               ]}
             />
             <Toggle label="إظهار قائمة القنوات" checked={settings.showChannels} onChange={(v) => set({ showChannels: v })} />
+            <Segmented
+              label="جودة البث"
+              value={settings.quality}
+              onChange={(v) => set({ quality: v })}
+              options={[
+                { v: 'auto', label: 'تلقائية — تبدأ بالأعلى وتتكيّف مع الإنترنت' },
+                { v: 'max', label: 'أعلى جودة دائمًا' },
+              ]}
+            />
 
-            <form className="add-ch" onSubmit={addChannel}>
-              <div className="field-label">إضافة قناة</div>
-              <input id="ch-name" data-nav placeholder="اسم القناة" value={newCh.name} onChange={(e) => setNewCh({ ...newCh, name: e.target.value })} />
-              <input id="ch-url" data-nav dir="ltr" inputMode="url" placeholder="https://…/playlist.m3u8" value={newCh.url} onChange={(e) => setNewCh({ ...newCh, url: e.target.value })} />
-              <input id="ch-site" data-nav dir="ltr" inputMode="url" placeholder="الموقع الرسمي (اختياري) https://…" value={newCh.site} onChange={(e) => setNewCh({ ...newCh, site: e.target.value })} />
-              <button className="btn" data-nav type="submit">
-                <IconPlus size={20} />
-                إضافة
-              </button>
-              <p className="muted small">استخدم روابط بث رسمية أو مرخّصة فقط. الصيغة المدعومة: HLS ‏(m3u8).</p>
-              {chMsg ? <p className="note" role="status">{chMsg}</p> : null}
-            </form>
-            {settings.customChannels.length ? (
-              <ul className="custom-ch">
-                {settings.customChannels.map((c) => (
-                  <li key={c.id}>
-                    <span>{c.name}</span>
-                    <button className="icon-btn sm" data-nav onClick={() => removeChannel(c.id)} aria-label={`حذف ${c.name}`}>
-                      <IconTrash size={18} />
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            ) : null}
+            <ChannelManager channels={channels} settings={settings} set={set} />
           </section>
 
           {/* ٣. الوقت والتاريخ */}
