@@ -1,4 +1,3 @@
-import Logo from './Logo.jsx';
 import { useNow, formatClockParts, formatGregorian, formatHijri } from '../lib/time.js';
 import { describe } from '../lib/weather.js';
 import { WeatherIcon, IconSettings, IconExpand, IconCollapse } from './Icons.jsx';
@@ -75,9 +74,8 @@ export default function Header({ city, settings, weather, onWeather, onSettings,
   return (
     <header className="topbar">
       <div className="topbar-start">
-        <Logo />
-        <div className="topbar-divider" aria-hidden="true" />
         <Clock tz={city.tz} settings={settings} />
+        <div className="topbar-divider" aria-hidden="true" />
         <DateDisplay tz={city.tz} settings={settings} />
       </div>
       <div className="topbar-end">
