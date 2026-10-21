@@ -7,6 +7,7 @@ export const BUILTIN = [
     id: 'sunnah', name: 'قناة السنة النبوية', short: 'السنة', tone: '#b89a5e', logo: '',
     officialUrl: 'https://www.sba.sa/',
     sources: [
+      { label: 'يوتيوب — البث الرسمي المباشر (HD)', url: 'https://www.youtube.com/live/Rs7St51oDDc' },
       { label: 'هيئة الإذاعة والتلفزيون — 720p', url: 'http://m.live.net.sa:1935/live/sunnah/playlist.m3u8' },
       { label: 'Globecast — 360p', url: 'https://cdn-globecast.akamaized.net/live/eds/saudi_sunnah/hls_roku/index.m3u8' },
       { label: 'Globecast — خادم بديل', url: 'https://cdnamd-hls-globecast.akamaized.net/live/ramdisk/saudi_sunnah/hls1/saudi_sunnah.m3u8' },

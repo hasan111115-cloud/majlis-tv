@@ -52,6 +52,13 @@ function safeRead() {
         sources: (c.sources || []).filter((x) => !String(x.url || '').includes('UCROKYPep-UuODNwyipe6JMw')),
         officialUrl: String(c.officialUrl || '').includes('saudisunnahtv') ? 'https://www.sba.sa/' : c.officialUrl,
       }));
+      // إضافة البث الرسمي الصحيح لقناة السنة في القوائم المحفوظة
+      const yt = 'https://www.youtube.com/live/Rs7St51oDDc';
+      merged.channelList = merged.channelList.map((c) =>
+        c.id === 'sunnah' && !(c.sources || []).some((x) => x.url === yt)
+          ? { ...c, sources: [{ label: 'يوتيوب — البث الرسمي المباشر (HD)', url: yt }, ...(c.sources || [])] }
+          : c,
+      );
     }
     return merged;
   } catch {
