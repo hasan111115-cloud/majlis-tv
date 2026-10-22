@@ -10,11 +10,11 @@ permissions:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04  # فيها Android SDK جاهز
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: 20
           cache: npm
@@ -24,12 +24,10 @@ jobs:
           npm ci
           npm run build
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: 17
-
-      - uses: android-actions/setup-android@v3
 
       - uses: gradle/actions/setup-gradle@v4
         with:
@@ -37,7 +35,10 @@ jobs:
 
       - name: Build APK
         working-directory: android
-        run: gradle --no-daemon assembleRelease
+        run: |
+          echo "sdk.dir=$ANDROID_HOME" > local.properties
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null || true
+          gradle --no-daemon assembleRelease
 
       - name: Rename
         run: cp android/app/build/outputs/apk/release/app-release.apk majlis-tv.apk
