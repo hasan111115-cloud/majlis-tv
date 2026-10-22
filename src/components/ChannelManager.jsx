@@ -3,6 +3,7 @@ import ChannelBadge from './ChannelBadge.jsx';
 import { analyzeUrl } from '../lib/channels.js';
 import { digitsOf } from '../lib/time.js';
 import { IconPlus, IconTrash, IconRetry } from './Icons.jsx';
+import { blocksHttp } from '../lib/env.js';
 
 const KIND_LABEL = { youtube: 'يوتيوب', hls: 'بث m3u8', file: 'ملف فيديو' };
 
@@ -10,7 +11,7 @@ const KIND_LABEL = { youtube: 'يوتيوب', hls: 'بث m3u8', file: 'ملف ف
 export async function testLink(url) {
   const info = analyzeUrl(url);
   if (!['youtube', 'hls', 'file'].includes(info.kind)) return { ok: false, hard: true, msg: info.reason };
-  if (location.protocol === 'https:' && url.trim().startsWith('http:')) {
+  if (blocksHttp() && url.trim().startsWith('http:')) {
     return {
       ok: false,
       hard: false,

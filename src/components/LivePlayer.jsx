@@ -4,6 +4,7 @@ import { IconMute, IconVolume, IconPlay, IconPause, IconExpand, IconRetry, IconE
 import ChannelBadge from './ChannelBadge.jsx';
 import { digitsOf } from '../lib/time.js';
 import { analyzeUrl } from '../lib/channels.js';
+import { blocksHttp } from '../lib/env.js';
 
 const SOURCE_TIMEOUT = 20000; // مهلة مصدر HLS قبل تجربة البديل
 const YT_TIMEOUT = 14000; // مهلة مصدر يوتيوب (القناة قد لا تكون في بث مباشر الآن)
@@ -12,7 +13,7 @@ const STALL_LIMIT = 25000; // تقطيع أطول من هذا = إعادة ات�
 const isApple = typeof navigator !== 'undefined' && /Apple/.test(navigator.vendor || '') && !/CriOS|FxiOS/.test(navigator.userAgent);
 
 function usableSources(channel) {
-  const httpsPage = typeof location !== 'undefined' && location.protocol === 'https:';
+  const httpsPage = blocksHttp();
   const all = (channel.sources || []).map((s) => ({ ...s, info: analyzeUrl(s.url) }));
   const ok = all.filter((s) => !(httpsPage && s.url.startsWith('http:')) && ['hls', 'file', 'youtube'].includes(s.info.kind));
   const invalid = all.find((s) => !['hls', 'file', 'youtube'].includes(s.info.kind));
